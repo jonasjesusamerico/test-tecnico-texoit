@@ -1,7 +1,7 @@
 package com.texoit.testtecnico.src.service;
 
 import com.opencsv.bean.CsvToBeanBuilder;
-import com.texoit.testtecnico.src.test.MovieParseCsv;
+import com.texoit.testtecnico.src.model.MovieParseCsv;
 import com.texoit.testtecnico.src.model.Movie;
 import com.texoit.testtecnico.src.model.Producer;
 import com.texoit.testtecnico.src.repository.ProducerRepository;

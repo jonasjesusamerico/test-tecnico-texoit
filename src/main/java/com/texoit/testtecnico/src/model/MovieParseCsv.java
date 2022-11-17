@@ -1,4 +1,4 @@
-package com.texoit.testtecnico.src.test;
+package com.texoit.testtecnico.src.model;
 
 import com.opencsv.bean.CsvBindByPosition;
 import lombok.Getter;

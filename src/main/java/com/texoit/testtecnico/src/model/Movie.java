@@ -1,7 +1,6 @@
 package com.texoit.testtecnico.src.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.texoit.testtecnico.src.test.MovieParseCsv;
 import lombok.*;
 
 import javax.persistence.*;
