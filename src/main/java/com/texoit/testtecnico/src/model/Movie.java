@@ -1,10 +1,8 @@
-package com.textoit.testtecnico.src.model;
+package com.texoit.testtecnico.src.model;
 
-import com.textoit.testtecnico.src.test.MovieParseCsv;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.texoit.testtecnico.src.test.MovieParseCsv;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -14,6 +12,8 @@ import javax.persistence.*;
 @Getter
 @Builder
 @ToString
+@NoArgsConstructor
+@AllArgsConstructor
 public class Movie {
 
     @Id
@@ -30,22 +30,28 @@ public class Movie {
     @Column(name = "STUDIOS")
     private String studios;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="I_PRODUCER", nullable=false)
+    @ManyToOne
+    @JoinColumn(name = "I_PRODUCER", nullable = false)
+    @JsonIgnore
     private Producer producer;
 
     @Column(name = "FL_WINNER")
     private Boolean winner;
 
+    public Boolean getWinner() {
+        return Boolean.TRUE.equals(winner);
+    }
 
     public static Movie convertFrom(MovieParseCsv csv) {
-        Producer producer = Producer.builder().name(csv.getProducers()).build();
         return Movie.builder()
                 .year(csv.getYear())
                 .title(csv.getTitle())
                 .studios(csv.getStudios())
-                .producer(producer)
                 .winner(csv.getWinner())
                 .build();
+    }
+
+    public void setProducers(Producer producer) {
+        this.producer = producer;
     }
 }
