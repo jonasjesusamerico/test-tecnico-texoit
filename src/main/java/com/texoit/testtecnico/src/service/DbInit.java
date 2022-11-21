@@ -1,8 +1,8 @@
 package com.texoit.testtecnico.src.service;
 
 import com.opencsv.bean.CsvToBeanBuilder;
-import com.texoit.testtecnico.src.model.MovieParseCsv;
 import com.texoit.testtecnico.src.model.Movie;
+import com.texoit.testtecnico.src.model.MovieParseCsv;
 import com.texoit.testtecnico.src.model.Producer;
 import com.texoit.testtecnico.src.repository.ProducerRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,31 +26,35 @@ public class DbInit {
         this.producerRepository = producerRepository;
     }
 
+    private static Set<Producer> createProducers(List<MovieParseCsv> beans) {
+        return beans.stream()
+                .sorted(Comparator.comparing(MovieParseCsv::getProducers))
+                .flatMap(DbInit::adjustProducerName)
+                .map(t -> Producer.builder().name(t).build())
+                .peek(producer -> producer.addMovies(getMovies(beans, producer)))
+                .collect(Collectors.toSet());
+    }
+
     @PostConstruct
-    public void init() {
+    public List<Producer> init() {
         try {
-            List<MovieParseCsv> beans = new CsvToBeanBuilder(new FileReader(fileName))
-                    .withSkipLines(1)
-                    .withSeparator(';')
-                    .withType(MovieParseCsv.class)
-                    .build()
-                    .parse();
-
-            Set<Producer> producers = beans.stream()
-                    .sorted(Comparator.comparing(MovieParseCsv::getProducers))
-                    .flatMap(DbInit::adjustProducerName)
-                    .map(t -> Producer.builder().name(t).build())
-                    .collect(Collectors.toSet());
-
-            producers.forEach(producer -> {
-                producer.addMovies(getMovies(beans, producer));
-            });
-
-            producerRepository.saveAll(producers);
+            Set<Producer> producers = dataExtractor(fileName);
+            producerRepository.deleteAll(producers);
+            return producerRepository.saveAll(producers);
         } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Unable to read the file", e);
         }
+    }
 
+    public Set<Producer> dataExtractor(final String fileName) throws FileNotFoundException {
+        List<MovieParseCsv> beans = new CsvToBeanBuilder(new FileReader(fileName))
+                .withSkipLines(1)
+                .withSeparator(';')
+                .withType(MovieParseCsv.class)
+                .build()
+                .parse();
+
+        return createProducers(beans);
     }
 
     private static Stream<String> adjustProducerName(MovieParseCsv csvLine) {

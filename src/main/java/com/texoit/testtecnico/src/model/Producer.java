@@ -24,8 +24,7 @@ public class Producer implements BaseEntity{
     @Column(name = "NAME")
     private String name;
 
-    @ToString.Exclude
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "producer")
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "producer")
     private final Set<Movie> movies = new HashSet<>(0);
 
     public void addMovies(Collection<Movie> movies) {

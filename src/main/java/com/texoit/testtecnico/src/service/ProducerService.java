@@ -3,19 +3,17 @@ package com.texoit.testtecnico.src.service;
 
 import com.texoit.testtecnico.src.model.Movie;
 import com.texoit.testtecnico.src.model.Producer;
-import com.texoit.testtecnico.src.repository.ProducerRepository;
 import com.texoit.testtecnico.src.model.ResponseInterval;
 import com.texoit.testtecnico.src.model.ResponseIntervalDto;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.texoit.testtecnico.src.repository.ProducerRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
 
 @Service
-public class ProducerService  extends AbstractService<Producer> {
+public class ProducerService extends AbstractService<Producer> {
 
-    @Autowired
     private final ProducerRepository producerRepository;
 
     public ProducerService(ProducerRepository producerRepository) {
@@ -24,11 +22,11 @@ public class ProducerService  extends AbstractService<Producer> {
 
     public ResponseInterval findIntervals() {
         List<Producer> producers = producerRepository.findProducerWithMoreThanOneMovie();
-        List<ResponseIntervalDto> collectMax = getCollectInterval(producers);
+        List<ResponseIntervalDto> collectInterval = getCollectInterval(producers);
 
         return new ResponseInterval(
-                collectMax.stream().filter(i -> i.getInterval() == getMinInterval(collectMax)).toList(),
-                collectMax.stream().filter(i -> i.getInterval() == getMaxInterval(collectMax)).toList()
+                collectInterval.stream().filter(i -> i.getInterval() == getMinInterval(collectInterval)).toList(),
+                collectInterval.stream().filter(i -> i.getInterval() == getMaxInterval(collectInterval)).toList()
         );
     }
 
