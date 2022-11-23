@@ -37,6 +37,10 @@ public class Movie {
     @Column(name = "FL_WINNER")
     private Boolean winner;
 
+    public static Movie empty() {
+        return new Movie();
+    }
+
     public Boolean getWinner() {
         return Boolean.TRUE.equals(winner);
     }

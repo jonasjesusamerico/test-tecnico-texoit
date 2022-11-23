@@ -3,9 +3,7 @@ package com.texoit.testtecnico.src.model;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "PRODUCER")
@@ -25,7 +23,7 @@ public class Producer implements BaseEntity{
     private String name;
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "producer")
-    private final Set<Movie> movies = new HashSet<>(0);
+    private final List<Movie> movies = new ArrayList<>(0);
 
     public void addMovies(Collection<Movie> movies) {
         this.movies.clear();

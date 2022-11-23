@@ -8,8 +8,7 @@ import com.texoit.testtecnico.src.model.ResponseIntervalDto;
 import com.texoit.testtecnico.src.repository.ProducerRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class ProducerService extends AbstractService<Producer> {
@@ -45,25 +44,29 @@ public class ProducerService extends AbstractService<Producer> {
     }
 
     private List<ResponseIntervalDto> getCollectInterval(List<Producer> producers) {
-        return producers.stream()
+        List<ResponseIntervalDto> list = new ArrayList<>(0);
+        producers.stream()
                 .filter(Producer::isMoreThenOneWin)
-                .map(producer -> {
-                    Movie maxMovie = getMaxMovie(producer);
-                    Movie minMovie = getMinMovie(producer);
-                    return getIntervalDto(producer, maxMovie.getYear() - minMovie.getYear(), minMovie, maxMovie);
-                }).toList();
+                .forEach(producer -> {
+                    List<Movie> collect = producer.getMovies().stream()
+                            .filter(Movie::getWinner)
+                            .sorted(Comparator.comparing(Movie::getYear)).toList();
+
+                    for (Movie movie : collect) {
+                        Movie next = getNextMovie(collect, movie);
+                        if (Objects.nonNull(next.getId())) {
+                            ResponseIntervalDto intervalDto = getIntervalDto(producer, next.getYear() - movie.getYear(), movie, next);
+                            list.add(intervalDto);
+                        }
+                    }
+                });
+        return list;
     }
 
-    private static Movie getMinMovie(Producer producer) {
-        return producer.getMovies().stream()
-                .filter(Movie::getWinner)
-                .min(Comparator.comparing(Movie::getYear)).get();
-    }
-
-    private static Movie getMaxMovie(Producer producer) {
-        return producer.getMovies().stream()
-                .filter(Movie::getWinner)
-                .max(Comparator.comparing(Movie::getYear)).get();
+    public Movie getNextMovie(List<Movie> collect, Movie movie) {
+        int idx = collect.indexOf(movie);
+        if (idx < 0 || idx + 1 == collect.size()) return Movie.empty();
+        return collect.get(idx + 1);
     }
 
     private ResponseIntervalDto getIntervalDto(Producer producer, int intervalAux, Movie current, Movie last) {
